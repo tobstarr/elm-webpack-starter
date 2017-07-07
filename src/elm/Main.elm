@@ -77,28 +77,95 @@ view : Model -> Html Msg
 view model =
     case model.route of
         AboutRoute ->
-            div [] [ h2 [] [ text "about" ] ]
+            layout
+                [ h2 [] [ text "about" ]
+                ]
 
         _ ->
-            div [ class "container", style [ ( "margin-top", "30px" ), ( "text-align", "center" ) ] ]
-                [ -- inline CSS (literal)
-                  div [ class "row" ]
-                    [ div [ class "col-xs-12" ]
-                        [ div [ class "jumbotron" ]
-                            [ img [ src "static/img/elm.jpg", style styles.img ] [] -- inline CSS (via var)
-                            , hello model.changes -- ext 'hello' component (takes 'model' as arg)
-                            , p [] [ text "Elm Webpack Starter" ]
-                            , button [ class "btn btn-primary btn-lg", onClick Increment ]
-                                [ -- click handler
-                                  span [ class "glyphicon glyphicon-star" ] [] -- glyphicon
-                                , span [] [ text "FTW!" ]
-                                ]
-                            , div []
-                                [ linkTo AboutRoute [ text "About" ] ]
-                            ]
+            layout
+                [ div []
+                    [ img [ src "static/img/elm.jpg", style styles.img ] [] -- inline CSS (via var)
+                    , hello model.changes -- ext 'hello' component (takes 'model' as arg)
+                    , p [] [ text "Elm Webpack Starter" ]
+                    , button [ class "btn btn-primary btn-lg", onClick Increment ]
+                        [ -- click handler
+                          span [ class "glyphicon glyphicon-star" ] [] -- glyphicon
+                        , span [] [ text "FTW!" ]
                         ]
+                    , div []
+                        [ linkTo AboutRoute [] [ text "About" ] ]
                     ]
                 ]
+
+
+layout a =
+    div
+        [ class "container"
+        , style
+            [ ( "margin-top", "30px" )
+            , ( "text-align", "center" )
+            ]
+        ]
+        [ navbar
+        , div [ class "row" ]
+            [ div [ class "col-xs-12" ]
+                a
+            ]
+        ]
+
+
+title =
+    "Elm Bootstrap"
+
+
+navigationItem ne =
+    li [ class "dropdown" ]
+        [ a [ href "#", class "dropdown-toggle", attribute "data-toggle" "dropdown", attribute "role" "button", attribute "aria-haspopup" "true", attribute "aria-expanded" "false" ] [ text ne.title ]
+        , ul [ class "dropdown-menu" ] (List.map navigationLink ne.links)
+        ]
+
+
+type alias NavigationLink =
+    { title : String
+    , route : Route
+    }
+
+
+navigationLink : NavigationLink -> Html Msg
+navigationLink link =
+    li []
+        [ linkTo link.route [] [ text link.title ]
+        ]
+
+
+navbar =
+    Html.nav
+        [ class "navbar navbar-default navbar-inverse"
+        , attribute "role" "navigation"
+        ]
+        [ div [ class "container-fluid" ]
+            [ div [ class "navbar-header" ]
+                [ button
+                    [ type_ "button"
+                    , class "navbar-toggle collapsed"
+                    , attribute "data-toggle" "collapse"
+                    , attribute "data-target" "#bs-example-navbar-collapse-1"
+                    , attribute "aria-expanded" "false"
+                    ]
+                    [ span [ class "sr-only" ] [ text "Toggle navigation" ]
+                    , span [ class "icon-bar" ] []
+                    , span [ class "icon-bar" ] []
+                    , span [ class "icon-bar" ] []
+                    ]
+                , linkTo HomeRoute [ class "navbar-brand" ] [ text title ]
+                ]
+            , div
+                [ class "collapse navbar-collapse", id "bs-example-navbar-collapse-1" ]
+                [ ul [ class "nav navbar-nav" ]
+                    (List.map navigationItem navigationMenu)
+                ]
+            ]
+        ]
 
 
 
@@ -112,6 +179,20 @@ styles =
         , ( "border", "4px solid #337AB7" )
         ]
     }
+
+
+navigationMenu =
+    [ { title = "Section 1"
+      , links =
+            [ { title = "Setion 1.1", route = HomeRoute }
+            ]
+      }
+    , { title = "Section 2"
+      , links =
+            [ { title = "Section 2.1", route = AboutRoute }
+            ]
+      }
+    ]
 
 
 subscriptions : Model -> Sub Msg
@@ -161,8 +242,8 @@ initialModel route =
     }
 
 
-linkTo : Route -> List (Html Msg) -> Html Msg
-linkTo route inner =
+linkTo : Route -> List (Attribute Msg) -> List (Html Msg) -> Html Msg
+linkTo route atts inner =
     let
         path =
             case route of
@@ -174,8 +255,11 @@ linkTo route inner =
 
                 NotFoundRoute ->
                     "/"
+
+        linkAtts =
+            atts ++ [ href path, onPreventDefaultClick (ChangeLocation path) ]
     in
-    a [ href "/changes", onPreventDefaultClick (ChangeLocation path) ] inner
+    a linkAtts inner
 
 
 onPreventDefaultClick : msg -> Attribute msg
