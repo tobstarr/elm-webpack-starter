@@ -57,11 +57,7 @@ update msg model =
             ( model, Navigation.newUrl path )
 
         OnLocationChange location ->
-            let
-                newRoute =
-                    parseLocation location
-            in
-            ( { model | route = newRoute }, Cmd.none )
+            handleLocation model location
 
         Increment ->
             { model | changes = model.changes + 1 } ! []
@@ -209,11 +205,15 @@ subscriptions model =
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
+    handleLocation initialModel location
+
+
+handleLocation model location =
     let
-        currentRoute =
+        route =
             parseLocation location
     in
-    ( initialModel currentRoute, Cmd.none )
+    ( { model | route = route }, Cmd.none )
 
 
 parseLocation : Navigation.Location -> Route
@@ -240,9 +240,9 @@ matchers =
         ]
 
 
-initialModel : Route -> Model
-initialModel route =
-    { route = route
+initialModel : Model
+initialModel =
+    { route = HomeRoute
     , changes = 0
     }
 
