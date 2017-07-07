@@ -8,7 +8,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (defaultOptions, onClick, onWithOptions)
 import Json.Decode
 import Navigation
-import UrlParser
+import UrlParser exposing ((</>))
 
 
 -- APP
@@ -54,7 +54,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ChangeLocation path ->
-            ( { model | changes = model.changes + 1 }, Navigation.newUrl path )
+            ( model, Navigation.newUrl path )
 
         OnLocationChange location ->
             let
@@ -81,21 +81,28 @@ view model =
                 [ h2 [] [ text "about" ]
                 ]
 
-        _ ->
-            layout
-                [ div []
-                    [ img [ src "static/img/elm.jpg", style styles.img ] [] -- inline CSS (via var)
-                    , hello model.changes -- ext 'hello' component (takes 'model' as arg)
-                    , p [] [ text "Elm Webpack Starter" ]
-                    , button [ class "btn btn-primary btn-lg", onClick Increment ]
-                        [ -- click handler
-                          span [ class "glyphicon glyphicon-star" ] [] -- glyphicon
-                        , span [] [ text "FTW!" ]
-                        ]
-                    , div []
-                        [ linkTo AboutRoute [] [ text "About" ] ]
-                    ]
+        HomeRoute ->
+            index model
+
+        NotFoundRoute ->
+            layout [ h1 [] [ text "Not Found" ] ]
+
+
+index model =
+    layout
+        [ div []
+            [ img [ src "static/img/elm.jpg", style styles.img ] [] -- inline CSS (via var)
+            , hello model.changes -- ext 'hello' component (takes 'model' as arg)
+            , p [] [ text "Elm Webpack Starter" ]
+            , button [ class "btn btn-primary btn-lg", onClick Increment ]
+                [ -- click handler
+                  span [ class "glyphicon glyphicon-star" ] [] -- glyphicon
+                , span [] [ text "FTW!" ]
                 ]
+            , div []
+                [ linkTo AboutRoute [] [ text "About" ] ]
+            ]
+        ]
 
 
 layout a =
@@ -219,20 +226,18 @@ parseLocation location =
             NotFoundRoute
 
 
+routes =
+    { user = "user"
+    , about = "about"
+    }
+
+
 matchers : UrlParser.Parser (Route -> a) a
 matchers =
     UrlParser.oneOf
         [ UrlParser.map HomeRoute UrlParser.top
-        , UrlParser.map AboutRoute (UrlParser.s "about")
+        , UrlParser.map AboutRoute (UrlParser.s routes.about)
         ]
-
-
-homePath =
-    "/"
-
-
-aboutPath =
-    "/about"
 
 
 initialModel : Route -> Model
@@ -246,20 +251,28 @@ linkTo : Route -> List (Attribute Msg) -> List (Html Msg) -> Html Msg
 linkTo route atts inner =
     let
         path =
-            case route of
-                AboutRoute ->
-                    "/about"
-
-                HomeRoute ->
-                    "/"
-
-                NotFoundRoute ->
-                    "/"
+            routeFor route
 
         linkAtts =
             atts ++ [ href path, onPreventDefaultClick (ChangeLocation path) ]
     in
     a linkAtts inner
+
+
+routeFor route =
+    let
+        r list =
+            "/" ++ String.join "/" list
+    in
+    case route of
+        AboutRoute ->
+            r [ routes.about ]
+
+        HomeRoute ->
+            r [ "" ]
+
+        NotFoundRoute ->
+            r [ "" ]
 
 
 onPreventDefaultClick : msg -> Attribute msg
