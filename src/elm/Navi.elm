@@ -16,9 +16,7 @@ type alias Item =
 
 
 type alias Link =
-    { title : String
-    , route : Route
-    }
+    ( String, Route )
 
 
 bar : String -> Html Msg
@@ -54,8 +52,8 @@ bar title =
 
 menu : Navigation
 menu =
-    [ ( "Section 1", [ { title = "Setion 1.1", route = Routing.Home } ] )
-    , ( "Section 2", [ { title = "Section 2.1", route = Routing.About } ] )
+    [ ( "Section 1", [ ( "Setion 1.1", Routing.Home ) ] )
+    , ( "Section 2", [ ( "Section 2.1", Routing.About ) ] )
     ]
 
 
@@ -68,7 +66,7 @@ renderItem ( title, links ) =
 
 
 renderLink : Link -> Html Msg
-renderLink link =
+renderLink ( title, route ) =
     li []
-        [ linkTo link.route [] [ text link.title ]
+        [ linkTo route [] [ text title ]
         ]
