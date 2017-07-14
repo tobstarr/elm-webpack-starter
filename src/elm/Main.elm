@@ -84,6 +84,7 @@ view model =
             layout [ h1 [] [ text "Not Found" ] ]
 
 
+index : Model -> Html Msg
 index model =
     layout
         [ div []
@@ -101,6 +102,7 @@ index model =
         ]
 
 
+layout : List (Html Msg) -> Html Msg
 layout a =
     div
         [ class "container"
@@ -117,21 +119,33 @@ layout a =
         ]
 
 
+title : String
 title =
     "Elm Bootstrap"
-
-
-navigationItem ne =
-    li [ class "dropdown" ]
-        [ a [ href "#", class "dropdown-toggle", attribute "data-toggle" "dropdown", attribute "role" "button", attribute "aria-haspopup" "true", attribute "aria-expanded" "false" ] [ text ne.title ]
-        , ul [ class "dropdown-menu" ] (List.map navigationLink ne.links)
-        ]
 
 
 type alias NavigationLink =
     { title : String
     , route : Route
     }
+
+
+type alias NavigationItem =
+    { links : List NavigationLink
+    , title : String
+    }
+
+
+type alias Navigation =
+    List NavigationItem
+
+
+navigationItem : NavigationItem -> Html Msg
+navigationItem ne =
+    li [ class "dropdown" ]
+        [ a [ href "#", class "dropdown-toggle", attribute "data-toggle" "dropdown", attribute "role" "button", attribute "aria-haspopup" "true", attribute "aria-expanded" "false" ] [ text ne.title ]
+        , ul [ class "dropdown-menu" ] (List.map navigationLink ne.links)
+        ]
 
 
 navigationLink : NavigationLink -> Html Msg
@@ -141,6 +155,7 @@ navigationLink link =
         ]
 
 
+navbar : Html Msg
 navbar =
     Html.nav
         [ class "navbar navbar-default navbar-inverse"
@@ -184,6 +199,7 @@ styles =
     }
 
 
+navigationMenu : Navigation
 navigationMenu =
     [ { title = "Section 1"
       , links =
@@ -208,6 +224,7 @@ init location =
     handleLocation initialModel location
 
 
+handleLocation : Model -> Navigation.Location -> ( Model, Cmd Msg )
 handleLocation model location =
     let
         route =
@@ -226,6 +243,7 @@ parseLocation location =
             NotFoundRoute
 
 
+routes : { user : String, about : String }
 routes =
     { user = "user"
     , about = "about"
@@ -259,6 +277,7 @@ linkTo route atts inner =
     a linkAtts inner
 
 
+routeFor : Route -> String
 routeFor route =
     let
         r list =
