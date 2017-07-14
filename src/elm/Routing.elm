@@ -1,7 +1,7 @@
 module Routing exposing (..)
 
 import Navigation
-import UrlParser exposing ((</>))
+import UrlParser exposing ((</>), map, oneOf, s, top)
 
 
 type Route
@@ -29,9 +29,9 @@ parseLocation location =
 
 matchers : UrlParser.Parser (Route -> a) a
 matchers =
-    UrlParser.oneOf
-        [ UrlParser.map Home UrlParser.top
-        , UrlParser.map About (UrlParser.s routes.about)
+    oneOf
+        [ map Home top
+        , map About (s routes.about)
         ]
 
 
