@@ -4,3 +4,4 @@ tmp/
 dist/
 yarn.lock
 elm.js
+yarn-error.log
