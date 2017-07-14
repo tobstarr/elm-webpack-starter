@@ -52,8 +52,8 @@ bar title =
 
 menu : Navigation
 menu =
-    [ ( "Section 1", [ ( "Setion 1.1", Routing.Home ) ] )
-    , ( "Section 2", [ ( "Section 2.1", Routing.About ) ] )
+    [ ( "Section 1", [ ( "Home", Routing.Home ) ] )
+    , ( "Section 2", [ ( "About", Routing.About ) ] )
     ]
 
 

@@ -64,7 +64,7 @@ view model =
     case model.route of
         Routing.About ->
             layout
-                [ h2 [] [ text "about" ]
+                [ h2 [] [ text "About" ]
                 ]
 
         Routing.Home ->
