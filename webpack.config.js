@@ -26,6 +26,7 @@ console.log('WEBPACK GO! Building for ' + TARGET_ENV);
 var commonConfig = {
     output: {
         path: outputPath,
+        publicPath: '/',
         filename: `static/js/${outputFilename}`,
     },
     resolve: {
